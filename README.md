@@ -45,7 +45,7 @@ USR-DU
 |     |---inference.py
 |     |---run.sh
 ```
-The Checkpoint and kernel_results can be found in (https://pan.baidu.com/s/1yfkWK-Kv5rWaqIEtfuOpDg?pwd=s9xl code: s9xl)
+The checkpoint and kernel_results can be found in (https://pan.baidu.com/s/1UkfCjSqwkdPhC5inB_7udw?pwd=i8pe code: i8pe)
 
 ## Data Preparation
 As *HR* is not responsible to pixel aligned with *LR*, we recommend to use [DIV2K](https://cv.snu.ac.kr/research/EDSR/DIV2K.tar) dataset as *HR* dataset, which is consist of clean and high-resolution images.
