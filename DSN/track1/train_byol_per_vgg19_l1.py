@@ -166,7 +166,7 @@ for ep in range(ep0, args.epochs_down):
     plot_score(os.path.join(args.experiment_dir, args.name), fake_score, real_score)
 
     if (ep + 1) % args.save_snapshot == 0:
-        epochs.append(ep)
+        epochs.append(ep + 1)
         saver.write_model_down(ep + 1, total_it + 1, ADM)
         eval_timer_down.tic()
         ADM.eval()
