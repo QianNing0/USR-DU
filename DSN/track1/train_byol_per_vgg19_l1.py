@@ -2,6 +2,7 @@ import os
 import yaml
 import torch
 import numpy as np
+import lpips
 from tqdm import tqdm
 from bicubic_pytorch import core
 
@@ -9,7 +10,7 @@ from track1.saver import Saver
 from track1.options import Options
 from track1.trainer_down_byol_per_vgg19_l1 import AdaptiveDownsamplingModel
 from track1.dataset import unpaired_dataset, paired_dataset
-from track1.utility import log_writer, plot_loss_down, plot_psnr, timer, calc_psnr, quantize, plot_loss, plot_score
+from track1.utility import log_writer, plot_loss_down, plot_psnr, timer, calc_psnr, quantize, plot_loss, plot_score, plot_loss_down, plot_lpips, save_metrics
 
 torch.manual_seed(0)
 
@@ -28,6 +29,9 @@ print(len(dataset), len(train_loader))
 dataset = unpaired_dataset(args, phase='test')
 test_loader_down = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False, num_workers=args.nThreads)
 print(len(dataset), len(test_loader_down))
+
+#metrics
+lpips_vgg_calc = lpips.LPIPS(net='vgg')
 
 ep0 = 0
 total_it = 0
@@ -57,6 +61,9 @@ if args.perceptual_loss:
     loss_per = []
 psnrs = []
 axis = []
+lpips_m = []
+epochs = []
+
 print('\ntraining start')
 for ep in range(ep0, args.epochs_down):
 
@@ -159,10 +166,12 @@ for ep in range(ep0, args.epochs_down):
     plot_score(os.path.join(args.experiment_dir, args.name), fake_score, real_score)
 
     if (ep + 1) % args.save_snapshot == 0:
+        epochs.append(ep)
         saver.write_model_down(ep + 1, total_it + 1, ADM)
         eval_timer_down.tic()
         ADM.eval()
         psnr_sum = 0
+        lpips_sum = 0
         cnt = 0
         with torch.no_grad():
             for img_s, img_t, fn in tqdm(test_loader_down, ncols=80):
@@ -182,11 +191,15 @@ for ep in range(ep0, args.epochs_down):
                     psnr_sum += calc_psnr(
                         img_fake, img_t, args.scale
                     )
+                    lpips_sum += lpips_vgg_calc(img_fake, img_t)
         eval_timer_down.hold()
         training_log.write('PSNR on test set: %.04f, %.01fs' % (psnr_sum / (cnt), eval_timer_down.release()))
         psnrs.append(psnr_sum / (cnt))
+        lpips_m.append(lpips_sum / cnt)
         axis.append(ep + 1)
         plot_psnr(os.path.join(args.experiment_dir, args.name), psnrs, axis)
+        plot_lpips(os.path.join(args.experiment_dir, args.name), lpips_m, axis)
+        save_metrics(os.path.join(args.experiment_dir, args.name), epochs, psnrs, lpips_m)
         ADM.train()
 
 

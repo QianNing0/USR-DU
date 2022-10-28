@@ -79,6 +79,25 @@ def plot_psnr(save, psnrs, axis):
     plt.close(fig)
 
 
+def plot_lpips(save, lpips_m, axis):
+    assert  len(lpips_m)==len(axis)
+    fig = plt.figure()
+
+    plt.plot(axis, lpips_m)
+
+    #plt.legend()
+    plt.xlabel('epoch')
+    plt.ylabel('LPIPS')
+    plt.grid(True)
+    plt.savefig(os.path.join(save,'lpips_graph.pdf'))
+    plt.close(fig)
+
+def save_metrics(save, epochs, psnr, lpips_m):
+    assert len(epochs) == len(psnr) and len(epochs) == len(lpips_m)
+    with open(os.path.join(save, "va_metrics.txt"), "w") as f:
+        for i in range(len(epochs)):
+            f.write("epoch %04d: psnr %.4f | lpips %.4f\n" % (epochs[i], psnr[i], lpips_m[i]))
+
 class timer():
     def __init__(self):
         self.acc = 0
