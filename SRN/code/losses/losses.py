@@ -8,8 +8,7 @@ from torch.nn import functional as F
 from code.archs.vgg_arch import VGGFeatureExtractor
 from code.utils.registry import LOSS_REGISTRY
 from .loss_util import weighted_loss
-import PerceptualSimilarity.models.util as ps
-
+from lpips import LPIPS
 _reduction_modes = ['none', 'mean', 'sum']
 
 
@@ -293,7 +292,7 @@ class PerceptualLoss(nn.Module):
 class PerceptualLossLPIPS(nn.Module):
     def __init__(self):
         super(PerceptualLossLPIPS, self).__init__()
-        self.loss_network = ps.PerceptualLoss(use_gpu=torch.cuda.is_available())
+        self.loss_network = LPIPS()
 
     def forward(self, x, y):
         return self.loss_network.forward(x, y, normalize=True).mean()

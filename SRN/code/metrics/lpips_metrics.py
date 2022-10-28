@@ -1,13 +1,10 @@
 import numpy as np
 
-
-from PerceptualSimilarity.util import util as util_LPIPS
-from PerceptualSimilarity.models.util import PerceptualLoss
-
+import lpips
 from code.metrics.metric_util import reorder_image
 from code.utils.registry import METRIC_REGISTRY
 
-cri_fea_lpips = PerceptualLoss(model='net-lin', net='alex', use_gpu=False)
+cri_fea_lpips = lpips.LPIPS(net='alex')
 
 @METRIC_REGISTRY.register()
 def calculate_lpips(img, img2, crop_border, input_order='HWC'):
@@ -24,7 +21,7 @@ def calculate_lpips(img, img2, crop_border, input_order='HWC'):
 
     img, img2 = img[:, :, [2, 1, 0]], img2[:, :, [2, 1, 0]]
 
-    img, img2 = util_LPIPS.im2tensor(img), util_LPIPS.im2tensor(img2)
+    img, img2 = lpips.im2tensor(img), lpips.im2tensor(img2)
 
     LPIPS = cri_fea_lpips(img, img2)[0][0][0][0]
 
