@@ -2,7 +2,6 @@ from code.utils.registry import ARCH_REGISTRY
 from torch import nn as nn
 from torch.nn import functional as F
 from torch.nn.utils import spectral_norm
-from .qa_arch import conv_block, sequential
 
 @ARCH_REGISTRY.register()
 class UNetDiscriminatorSN(nn.Module):
@@ -266,33 +265,5 @@ class NLayerDiscriminator(nn.Module):
     def forward(self, x):
         """Standard forward."""
         return self.model(x)
-
-
-@ARCH_REGISTRY.register()
-class Patch_Discriminator(nn.Module):
-
-    def __init__(self, in_nc, base_nf, norm_type='batch', act_type='leakyrelu', mode='CNA', out_feat=256):
-        super(Patch_Discriminator, self).__init__()
-        # 192, 64 (12,512)
-        conv0 = conv_block(in_nc, base_nf, kernel_size=4, stride=2, norm_type=None, act_type=act_type, mode=mode)
-        conv1 = conv_block(base_nf, 2 * base_nf, kernel_size=4, stride=2, norm_type=norm_type, act_type=act_type, mode=mode)
-        # 96, 64 (6,64)
-        conv2 = conv_block(2 * base_nf, base_nf * 4, kernel_size=4, stride=2, norm_type=norm_type, act_type=act_type, mode=mode)
-        conv3 = conv_block(base_nf * 4, base_nf * 8, kernel_size=4, stride=2, norm_type=norm_type, act_type=act_type, mode=mode)
-        # 48, 128 (3,128)
-        conv4 = conv_block(base_nf * 8, base_nf * 8, kernel_size=4, stride=2, norm_type=norm_type, act_type=act_type, mode=mode)
-        conv5 = conv_block(base_nf * 8, 1, kernel_size=4, norm_type=None, act_type='sigm', mode=mode)
-
-        self.features = sequential(conv0, conv1, conv2, conv3, conv4, conv5)
-
-        # self.gap = nn.AdaptiveAvgPool2d((1,1))
-        # self.classifier = nn.Sequential(
-        #    nn.Linear(base_nf*8, 512), nn.LeakyReLU(0.2, True), nn.Linear(512, out_feat))
-
-    def forward(self, x):
-        x = self.features(x)
-        # x = x.view(x.size(0), -1)
-        # x = self.classifier(x)
-        return x
 
 
