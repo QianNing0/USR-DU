@@ -63,7 +63,7 @@ network_g:
   out_nc: 3
   nf: 64
   nb: 23
-  weighted_loss: false
+  # weighted_loss: false
 
 network_d:
   type: UNetDiscriminatorSN
