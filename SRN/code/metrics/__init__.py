@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 from code.utils.registry import METRIC_REGISTRY
-from .lpips import calculate_lpips
+from .lpips_metrics import calculate_lpips
 from .psnr_ssim import calculate_psnr, calculate_ssim
 
 __all__ = ['calculate_psnr', 'calculate_ssim', 'calculate_lpips']
