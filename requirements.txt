@@ -1,0 +1,14 @@
+imageio
+lpips
+matplotlib
+numpy
+pillow
+git+https://github.com/fbcotter/pytorch_wavelets.git
+pywavelets
+pyyaml
+scipy
+tensorboard
+tensorboardx
+torch>=1.7.0
+torchvision
+tqdm
